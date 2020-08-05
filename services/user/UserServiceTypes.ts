@@ -75,6 +75,8 @@ export interface GetFavoriteCommunitiesParams {
     offset?: number;
 }
 
+
+
 export interface GetAdministratedCommunitiesParams {
     offset?: number;
 }
@@ -315,6 +317,17 @@ export interface EnablePostCommentsParams {
 
 
 export interface DisablePostCommentsParams {
+    post: IPost;
+}
+
+
+export interface TranslatePostParams {
+    post: IPost;
+}
+
+
+export interface TranslatePostCommentParams {
+    postComment: IPostComment;
     post: IPost;
 }
 

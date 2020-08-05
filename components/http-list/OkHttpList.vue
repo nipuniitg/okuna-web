@@ -3,11 +3,12 @@
         <div v-if="searcher && showSearchBar">
         </div>
         <div v-if="searchQuery">
-            <div v-if="searchInProgress && ! (searchItems.length > 0)" class="has-padding-20 ok-has-text-primary-invert">
+            <div v-if="searchInProgress && ! (searchItems.length > 0)"
+                 class="has-padding-20 ok-has-text-primary-invert">
                 <ok-loading-indicator></ok-loading-indicator>
             </div>
             <div v-else-if="searchItems.length > 0">
-                <div v-for="item in searchItems" :key="searchItems.id" :class="itemClass"
+                <div v-for="item in searchItems" :key="item.id" :class="itemClass"
                      @click="onListItemClicked(item)">
                     <slot name="default" :item="item"></slot>
                 </div>
@@ -16,13 +17,26 @@
                 {{ $t('global.snippets.no_results_for_query', {query: searchQuery})}}
             </div>
         </div>
-        <div v-else-if="refresher" class="ok-http-list-infinite-loading" :class="itemsContainerClass">
-            <div v-for="item in items" :key="item.id" :class="itemClass">
+        <div v-else-if="refresher" class="ok-http-list-infinite-loading"
+             :class="{[`${itemsContainerClass}`]: items.length}">
+            <div v-for="item in items" :key="listKey + '-' + item.id" :class="itemClass">
                 <slot name="default" :item="item"></slot>
             </div>
             <infinite-loading
                     ref="infiniteLoading"
                     @infinite="infiniteHandler">
+
+                <template v-if="listType === 'post' && !items.length" slot="spinner">
+                    <ok-post-skeleton :class="itemClass"></ok-post-skeleton>
+                </template>
+
+                <template v-else-if="listType === 'community' && !items.length" slot="spinner">
+                    <ok-community-card-skeleton></ok-community-card-skeleton>
+                </template>
+
+                <template v-else-if="listType === 'community-mobile' && !items.length" slot="spinner">
+                    <ok-community-tile-skeleton></ok-community-tile-skeleton>
+                </template>
 
                 <template slot="no-more">
                     <div :class="{'is-hidden': !showNoMore}" class="ok-has-text-primary-invert">
@@ -50,7 +64,7 @@
         min-width: 100%;
     }
 
-    .ok-http-list-infinite-loading{
+    .ok-http-list-infinite-loading {
         min-height: 50px;
         min-width: 100%;
     }
@@ -68,11 +82,18 @@
     } from "~/components/http-list/lib/OkHttpListParams";
     import { CancelableOperation } from "~/lib/CancelableOperation";
     import OkLoadingIndicator from "~/components/utils/OkLoadingIndicator.vue";
-
+    import OkPostSkeleton from "~/components/skeletons/post/OkPostSkeleton.vue";
+    import OkCommunityCardSkeleton from "~/components/skeletons/cards/community-card/OkCommunityCardSkeleton.vue";
+    import OkCommunityTileSkeleton from "~/components/skeletons/tiles/OkCommunityTileSkeleton.vue";
 
     @Component({
         name: "OkHttpList",
-        components: {OkLoadingIndicator},
+        components: {
+            OkLoadingIndicator,
+            OkPostSkeleton,
+            OkCommunityCardSkeleton,
+            OkCommunityTileSkeleton
+        },
     })
     export default class OkHttpList<T> extends Vue {
 
@@ -118,6 +139,10 @@
             type: String,
         }) readonly itemsContainerClass: string;
 
+        @Prop({
+            type: String,
+        }) readonly listType: string;
+
         $refs!: {
             infiniteLoading: InfiniteLoading
         };
@@ -125,7 +150,6 @@
         searchItems: T[] = [];
         searchQuery = "";
         searchInProgress = false;
-        private searchRequestOperation?: CancelableOperation<any>;
 
         items: T[] = [];
 
@@ -136,9 +160,19 @@
         private wasBootstrapped = false;
 
         private utilsService: IUtilsService = okunaContainer.get<IUtilsService>(TYPES.UtilsService);
+        private onScrollLoaderOperation?: CancelableOperation<T[]>;
+        private refreshOperation?: CancelableOperation<T[]>;
+        private searchRequestOperation?: CancelableOperation<any>;
+
 
         created() {
             this.listKey = `l-${this.utilsService.generateUuid()}`;
+        }
+
+        destroyed() {
+            this.refreshOperation?.cancel();
+            this.searchRequestOperation?.cancel();
+            this.onScrollLoaderOperation?.cancel();
         }
 
         async infiniteHandler($vueInfiniteLoadingState) {
@@ -149,14 +183,16 @@
                 if (this.items.length) {
                     if (this.onScrollLoader) {
                         // Load more
-                        items = await this.onScrollLoader(this.items);
+                        this.onScrollLoaderOperation = CancelableOperation.fromPromise(this.onScrollLoader(this.items));
+                        items = await this.onScrollLoaderOperation.value;
                     } else {
                         $vueInfiniteLoadingState.complete();
                         return;
                     }
                 } else {
                     // Initial refresh
-                    items = await this.refresher();
+                    this.refreshOperation = CancelableOperation.fromPromise(this.refresher());
+                    items = await this.refreshOperation.value;
                 }
 
                 if (items && items.length > 0) {
@@ -246,6 +282,3 @@
 
     }
 </script>
-
-
-

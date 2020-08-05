@@ -1,11 +1,20 @@
 import { inject, injectable } from '~/node_modules/inversify';
 import {
-    CommunityActionsModalParams, ConnectionsCirclesPickerModalParams, HashtagActionsModalParams,
+    CommunityActionsModalParams,
+    ConnectionsCirclesPickerModalParams,
+    HashtagActionsModalParams,
     HttpListModalParams,
     IModalService,
-    ModalParams, PostActionsModalParams, PostCommentActionsModalParams, PostCommentReactionsModalParams,
+    ModalParams,
+    PostActionsModalParams,
+    PostCommentActionsModalParams,
+    PostCommentReactionsModalParams,
     PostModalParams,
-    PostReactionsModalParams, ReportObjectModalParams, UserActionsModalParams, ThemeModalParams
+    PostReactionsModalParams,
+    ReportObjectModalParams,
+    UserActionsModalParams,
+    ThemeModalParams,
+    CommunityStaffModalParams, CommunityRulesModalParams
 } from '~/services/modal/IModalService';
 // From outside Vue instance
 import { BehaviorSubject } from '~/node_modules/rxjs';
@@ -109,6 +118,43 @@ export class ModalService implements IModalService {
         return this.openModal(ModalType.themes, params);
     }
 
+    async openGetTheAppModal(): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.getTheApp);
+    }
+
+    async openWelcomeToOkunaWebModal(): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.welcomeToOkunaWeb);
+    }
+
+    async openCommunityRulesModal(params: CommunityRulesModalParams): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.communityRules, params);
+    }
+
+    async openCommunityStaffModal(params: CommunityStaffModalParams): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.communityStaff, params);
+    }
+
+
+    async openTermsOfUseModal(): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.termsOfUse);
+    }
+
+
+    async openPrivacyPolicyModal(): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.privacyPolicy);
+    }
+
+
+    async openCommunityGuidelinesModal(): Promise<void> {
+        this.ensureHasNoActiveModal();
+        return this.openModal(ModalType.communityGuidelines);
+    }
 
     notifyModalClosed(): void {
         this.ensureHasActiveModal();
@@ -122,7 +168,7 @@ export class ModalService implements IModalService {
         this.activeModalReturnData = any;
     }
 
-    private openModal(modalType: ModalType, params: ModalParams): Promise<any> {
+    private openModal(modalType: ModalType, params?: ModalParams): Promise<any> {
         this.activeModalParams.next(params);
         this.activeModal.next(modalType);
         this.logModalOpened();
@@ -145,7 +191,7 @@ export class ModalService implements IModalService {
         this.activeModalResolver = undefined;
     }
 
-    private ensureHasNoActiveModal() {
+    ensureHasNoActiveModal() {
         if (this.activeModalPromise) {
             this.notifyModalClosed();
         }

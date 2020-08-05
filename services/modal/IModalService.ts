@@ -14,6 +14,8 @@ import { ICircle } from '~/models/connections/circle/ICircle';
 export interface IModalService {
 
     // Methods for clients
+    ensureHasNoActiveModal();
+
     openPostModal(params: PostModalParams): Promise<void>;
 
     openPostReactionsModal(params: PostReactionsModalParams): Promise<void>;
@@ -36,7 +38,21 @@ export interface IModalService {
 
     openConnectionsCirclesPickerModal(params: ConnectionsCirclesPickerModalParams): Promise<void>;
 
+    openTermsOfUseModal(): Promise<void>;
+
+    openPrivacyPolicyModal(): Promise<void>;
+
+    openCommunityGuidelinesModal(): Promise<void>;
+
     openThemesModal(params: ThemeModalParams): Promise<void>;
+
+    openGetTheAppModal(): Promise<void>;
+
+    openWelcomeToOkunaWebModal(): Promise<void>;
+
+    openCommunityRulesModal(params: CommunityRulesModalParams): Promise<void>;
+
+    openCommunityStaffModal(params: CommunityStaffModalParams): Promise<void>;
 
     // Methods for OkModals component
     activeModal: BehaviorSubject<ModalType | undefined>
@@ -133,4 +149,12 @@ export interface ReportObjectModalParams {
 
 export interface ThemeModalParams {
     title: string;
+}
+
+export interface CommunityRulesModalParams {
+    community: ICommunity;
+}
+
+export interface CommunityStaffModalParams {
+    community: ICommunity;
 }

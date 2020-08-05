@@ -11,7 +11,7 @@ import OkUserPage from "./pages/home/pages/user/OkUserProfilePage";
 import OkCommunitiesPage from "./pages/home/pages/communities/OkCommunitiesPage";
 import OkAuthPage from "./pages/auth/OkAuthPage";
 import OkLoginPage from "./pages/auth/pages/OkLoginPage";
-import OkRegisterPage from "./pages/auth/pages/OkRegisterPage";
+import OkRegisterPage from "./pages/auth/pages/register-page/OkRegisterPage";
 import OkCommunityProfile from "./pages/home/pages/community/OkCommunityProfile";
 
 Vue.use(Router);
@@ -19,6 +19,13 @@ Vue.use(Router);
 export function createRouter() {
     return new Router({
         mode: 'history',
+        scrollBehavior(to, from, savedPosition) {
+            if (to.name === 'timeline' || to.name === 'now') {
+                return false;
+            }
+
+            return {x: 0, y: savedPosition || 0}
+        },
         routes: [
             {
                 path: '/',
@@ -28,7 +35,7 @@ export function createRouter() {
                     {
                         name: 'timeline',
                         path: '',
-                        component: OkTimelinePage
+                        component: OkTimelinePage,
                     },
                     {
                         path: 'm',
@@ -48,6 +55,7 @@ export function createRouter() {
                         component: OkCommunityProfile,
                     },
                     {
+                        name: 'now',
                         path: 'now',
                         component: OkNowPage
                     },
@@ -61,6 +69,7 @@ export function createRouter() {
                         component: OkPostPage,
                     },
                     {
+                        name: 'user',
                         path: ':userUsername',
                         component: OkUserPage,
                     },

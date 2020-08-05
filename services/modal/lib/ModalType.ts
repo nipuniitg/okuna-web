@@ -10,7 +10,14 @@ export class ModalType {
     static hashtagActions = new ModalType('HashtagActions');
     static postCommentActions = new ModalType('PostCommentActions');
     static connectionsCirclesPicker = new ModalType('ConnectionsCirclesPicker');
+    static termsOfUse = new ModalType('TermsOfUse');
+    static privacyPolicy = new ModalType('PrivacyPolicy');
+    static communityGuidelines = new ModalType('PrivacyPolicy');
     static themes = new ModalType('Themes');
+    static welcomeToOkunaWeb = new ModalType('WelcomeToOkunaWeb');
+    static getTheApp = new ModalType('GetTheApp');
+    static communityRules = new ModalType('CommunityRules');
+    static communityStaff = new ModalType('CommunityStaff');
 
 
     static _values: ModalType[] = [
@@ -23,7 +30,14 @@ export class ModalType {
         ModalType.communityActions,
         ModalType.postCommentActions,
         ModalType.connectionsCirclesPicker,
+        ModalType.termsOfUse,
+        ModalType.privacyPolicy,
+        ModalType.communityGuidelines,
         ModalType.themes,
+        ModalType.welcomeToOkunaWeb,
+        ModalType.getTheApp,
+        ModalType.communityRules,
+        ModalType.communityStaff,
     ];
 
     static values() {

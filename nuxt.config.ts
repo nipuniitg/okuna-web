@@ -1,17 +1,59 @@
-const result = require('dotenv').config();
+const dotEnvSrc = process.env.NODE_ENV === 'production' ? './.prod.env' : './.dev.env';
+
+const result = require('dotenv').config({
+    path: dotEnvSrc,
+});
+
+const processEnvVars = {
+    LOGGING: undefined,
+    SENTRY_DSN: undefined,
+    ENVIRONMENT: undefined,
+    API_URL: undefined,
+    TERMS_OF_USE_MD_URL: undefined,
+    PRIVACY_POLICY_MD_URL: undefined,
+    COMMUNITY_GUIDELINES_MD_URL: undefined,
+};
+
+Object.keys(processEnvVars).forEach((envVar) => {
+    if (process.env[envVar]) processEnvVars[envVar] = process.env[envVar];
+});
+
+const frontendEnvVars = {
+    ...result.parsed,
+    ...processEnvVars,
+};
+
 
 export default {
     mode: 'spa',
-    env: result.parsed,
+    env: frontendEnvVars,
     head: {
-        title: 'okuna-web',
+        title: 'Okuna',
         meta: [
             {charset: 'utf-8'},
             {name: 'viewport', content: 'width=device-width, initial-scale=1.0'},
-            {hid: 'description', name: 'description', content: 'The Okuna social network web version'}
+            {hid: 'description', name: 'description', content: 'Ethical social network.'},
+            {name: 'theme-color', content: '#ffffff'},
+            {name: 'msapplication-TileColor', content: '#000000'},
+            {
+                'property': 'og:title',
+                'content': `Okuna`,
+            },
+            {
+                'property': 'og:description',
+                'content': `Ethical Social Network.`,
+            },
+            {
+                'property': 'og:image',
+                'content': `https://okuna.io/og-image.png`
+            }
         ],
         link: [
-            {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'}
+            {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
+            {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
+            {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png'},
+            {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png'},
+            {rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#ffffff'},
         ],
     },
     loading: {color: '#000000'},
@@ -46,7 +88,6 @@ export default {
         '~/plugins/vue-infinite-loading',
         '~/plugins/vue-scroll-to',
         '~/plugins/vue-sticky',
-        '~/plugins/scroll-behavior',
         '~/plugins/vue-moment',
         '~/plugins/vue-popper',
         '~/plugins/vue-progressive-image',
@@ -58,7 +99,7 @@ export default {
     ],
     router: {
         middleware: ['post-redirect'],
-        //mode: 'hash'
+        //mode: 'hash',
     },
     i18n: {
         baseUrl: 'https://okuna.io',
@@ -107,6 +148,7 @@ export default {
     },
     proxy: {
         '/local/': {target: 'https://api.openbook.social', pathRewrite: {'^/local/': ''}},
+        '/www/': {target: 'https://www.okuna.io', pathRewrite: {'^/www/': ''}},
     },
     styleResources: {
         scss: [

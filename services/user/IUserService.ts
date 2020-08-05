@@ -50,7 +50,12 @@ import {
     SearchCommunitiesParams,
     SearchCommunityAdministratorsParams,
     SearchCommunityMembersParams,
-    SearchCommunityModeratorsParams, SearchHashtagsParams, SearchUsersParams, UnblockUserParams,
+    SearchCommunityModeratorsParams,
+    SearchHashtagsParams,
+    SearchUsersParams,
+    TranslatePostParams,
+    TranslatePostCommentParams,
+    UnblockUserParams,
     UnfollowUserParams, UpdateConnectionWithUserParaUserParams
 } from '~/services/user/UserServiceTypes';
 import { IPost } from '~/models/posts/post/IPost';
@@ -66,7 +71,11 @@ import {
     LoginApiParams,
     RegistrationApiParams,
     RegistrationResponse,
-    RequestResetPasswordApiParams, ResetPasswordApiParams
+    RequestResetPasswordApiParams,
+    ResetPasswordApiParams,
+    IsInviteTokenValidApiParams,
+    IsEmailAvailableApiParams,
+    IsUsernameAvailableApiParams
 } from '~/services/Apis/auth/AuthApiServiceTypes';
 import { INotification } from '~/models/notifications/notification/INotification';
 import { IFollow } from '~/models/follows/follow/IFollow';
@@ -75,6 +84,7 @@ import { IHashtag } from '~/models/common/hashtag/IHashtag';
 import { IModerationCategory } from '~/models/moderation/moderation_category/IModerationCategory';
 import { IConnection } from '~/models/connections/connection/IConnection';
 import { ICircle } from '~/models/connections/circle/ICircle';
+import { GetSuggestedCommunitiesApiParams } from '~/services/Apis/communities/CommunitiesApiServiceTypes';
 
 
 export interface IUserService {
@@ -85,6 +95,12 @@ export interface IUserService {
     login(data: LoginApiParams): Promise<IUser>;
 
     register(data: RegistrationApiParams): Promise<RegistrationResponse>;
+
+    isInviteTokenValid(data: IsInviteTokenValidApiParams): Promise<boolean>;
+
+    isEmailAvailable(data: IsEmailAvailableApiParams): Promise<boolean>;
+
+    isUsernameAvailable(data: IsUsernameAvailableApiParams): Promise<boolean>;
 
     requestResetPassword(data: RequestResetPasswordApiParams): Promise<void>;
 
@@ -97,6 +113,8 @@ export interface IUserService {
     getStoredAuthToken(): Promise<string>;
 
     loginWithAuthToken(token: string): Promise<IUser>;
+
+    storeAuthToken(token: string): void;
 
     loginWithStoredAuthToken(): Promise<IUser>;
 
@@ -123,6 +141,8 @@ export interface IUserService {
     getTrendingCommunities(params?: GetTrendingCommunitiesParams): Promise<ICommunity[]>;
 
     getFavoriteCommunities(params?: GetFavoriteCommunitiesParams): Promise<ICommunity[]>;
+
+    getSuggestedCommunities(params?: GetSuggestedCommunitiesApiParams): Promise<ICommunity[]>;
 
     getAdministratedCommunities(params?: GetAdministratedCommunitiesParams): Promise<ICommunity[]>;
 
@@ -213,6 +233,10 @@ export interface IUserService {
     enablePostComments(params: EnablePostCommentsParams): Promise<void>;
 
     disablePostComments(params: DisablePostCommentsParams): Promise<void>;
+
+    translatePost(params: TranslatePostParams): Promise<String>;
+
+    translatePostComment(params: TranslatePostCommentParams): Promise<String>;
 
     // POSTS END
 
